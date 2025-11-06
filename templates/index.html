@@ -1,34 +1,1234 @@
-<!doctype html>
-<html lang="vi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Brancher</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body { font-family: Arial, sans-serif; padding: 1rem; max-width: 800px; margin: auto; }
-    label { display:block; margin-top: 0.5rem; }
-    input, textarea { width:100%; padding: 0.4rem; margin-top:0.2rem; }
-    button { padding: 0.6rem 1rem; margin-top: 1rem; }
-    pre { background:#f5f5f5; padding:0.8rem; overflow:auto; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brancher</title>
+    
+    <!-- Google Fonts - Montserrat + Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/xterm.css">
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brancher</title>
+    <link rel="stylesheet" href="/static/css/xterm.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #171821;
+            color: #e0e6ed;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        
+        .bg-dark-1 { background: #171821; }
+        .bg-dark-2 { background: #21222d; }
+        .bg-dark-3 { background: #2d3548; }
+        .bg-accent { background: #ea7c69; }
+        .text-accent { color: #ea7c69; }
+        .border-dark { border-color: #21222d; }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #171821;
+            border-right: 1px solid #21222D;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logo-icon img {
+            width: 44px;
+            height: 44px;
+            display: block;
+        }
+        
+        .logo-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: #EA7C69;
+            line-height: 1;
+            font-family: 'Montserrat', sans-serif;
+            transform: translateY(-7px);
+        }
+        
+        .machine-card {
+            background: #ea7c69;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #171821;
+        }
+        
+        .machine-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 133, 99, 0.4);
+        }
+        
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .machine-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .machine-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .machine-actions button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            color: #171821;
+            font-size: 14px;
+        }
+        
+        .machine-actions button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2d3548;
+            border: 1px solid #21222d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e0e6ed;
+        }
+        
+        .btn-icon:hover {
+            background: #21222d;
+            border-color: #ea7c69;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            background: #2d3548;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+        
+        .status-badge.connected {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        
+        /* Panels */
+        .panel {
+            background: #21222d;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e6ed;
+        }
+        
+        /* Auth Section */
+        .auth-section {
+            background: #171821;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 2px dashed #21222d;
+        }
+        
+        .auth-input-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .input-field {
+            flex: 1;
+            background: #2d3548;
+            border: 1px solid #21222d;
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #e0e6ed;
+            font-size: 14px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #ea7c69;
+        }
+        
+        .btn-primary {
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            padding: 0;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:disabled {
+            background: #21222d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon-wrapper:hover {
+            background: rgba(255, 255, 255, 0.25); 
+        }
+
+        .btn-icon-wrapper img {
+            width: 22px;
+            height: 22px;
+            filter: brightness(0) invert(1);
+        }
+        
+        /* Sensor Config */
+        .sensor-item {
+            background: #171821;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 3px solid #ea7c69;
+        }
+        
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .sensor-value {
+            background: #2d3548;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #e0e6ed;
+            font-size: 14px;
+            border: 1px solid #21222d;
+        }
+        
+        /* Messages */
+        .messages-box {
+            background: #171821;
+            border-radius: 8px;
+            padding: 16px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 24px;
+        }
+        
+        .message-item {
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            background: #21222d;
+            border-radius: 6px;
+            border-left: 3px solid #ea7c69;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+        
+        .message-content {
+            font-size: 13px;
+            color: #e0e6ed;
+        }
+        
+        .message-sensor {
+            color: #ea7c69;
+            font-weight: 600;
+        }
+        
+        .message-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
+        .status-normal {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        /* Terminal */
+        .terminal-container {
+            background: #0f1419;
+            border-radius: 8px;
+            padding: 8px;
+            height: 400px;
+            margin-top: 12px;
+        }
+        
+        /* MQTT Settings */
+        .mqtt-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #171821;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #21222d;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4d5468;
+        }
+        
+        /* Status Message */
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .status-message.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        /* Edit mode styles */
+        .sensor-item.edit-mode {
+            border-left-color: #4caf50;
+        }
+        
+        .sensor-item.edit-mode .sensor-value {
+            background: #171821;
+            border-color: #4caf50;
+        }
+        
+        .sensor-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-icon-border {
+            width: 44px;
+            height: 44px;
+            background: #2d3548;
+            border: 1px solid #3d4458;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        
+        .btn-icon-border:hover {
+            transform: translateY(-2px);
+        }
+        
+
+        .btn-edit,
+        .btn-cancel,
+        .btn-save,
+        .btn-delete {
+            width: 44px;
+            height: 44px;
+            background: #2d3548;
+            border: 1px solid #3d4458;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .btn-cancel:hover,
+        .btn-save:hover,
+        .btn-edit:hover,
+        .btn-delete:hover {
+            background: #363b4e;  
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel img,
+        .btn-save img,
+        .btn-edit img,
+        .btn-delete img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+        
+        input.sensor-value {
+            color: #e0e6ed;
+        }
+        
+        input.sensor-value:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+    </style>
 </head>
 <body>
-  <h2>Brancher</h2>
-  <p>Enter your token below (Authorization Bearer).</p>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="/static/icons/brancher_edited.png" alt="logo-icon" style="width: 144px; height: 144px; object-fit: contain;">
+                </div>
+                <div class="logo-text">brancher</div>
+            </div>
+            
+            <div class="machine-card">
+                <div class="machine-header">
+                    <div class="machine-name">Machine 1</div>
+                    <div class="machine-actions">
+                        <button onclick="refreshData()" title="Refresh">
+                            <img src="/static/icons/reload.png" alt="Refresh" style="width: 20px; height: 20px;">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="status-badge" id="sensorCount">Sensors: 0</div>
+                    <div class="status-badge" id="mqttStatus">MQTT: Disconnected</div>
+                </div>
+                <div class="header-right">
+                    <div class="status-badge" id="currentTime"></div>
+                    <div class="user-icon">
+                        <img src="/static/icons/user.png" alt="User" title="user" style="width: 20px; height: 20px;">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Message -->
+            <div id="statusMessage" class="status-message"></div>
+            
+            <!-- Auth Section -->
+            <div class="auth-section">
+                <div class="auth-input-group">
+                    <input type="password" id="tokenInput" class="input-field" placeholder="Enter API Token" value="">
+                    <button id="loadBtn" class="btn-primary">Authenticate</button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Sensors Configuration -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Sensors Configuration</div>
+                            <button class="btn-icon" onclick="saveConfig()" title="Save Config">
+                                <img src="/static/icons/save_2.png" alt="Save" style="width: 20px; height: 20px;">
+                            </button>
+                        </div>
+                        
+                        <div id="sensorsContainer">
+                            <div class="empty-state">
+                                <div>Please authenticate to load configuration</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Sensor Button -->
+                        <div id="addSensorContainer" style="display: none; text-align: center; margin-top: 20px;">
+                            <button class="btn-primary" onclick="addNewSensor()">
+                                <div class="btn-icon-wrapper">
+                                    <img src="/static/icons/plus_1.png" alt="Add">
+                                </div>
+                                
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages -->
+                    <div class="panel" style="margin-top: 24px;">
+                        <div class="panel-header">
+                            <div class="panel-title">Real-time MQTT Messages</div>
+                            <button class="btn-icon" onclick="clearMessages()" title="Clear">
+                                <img src="/static/icons/delete_2.png" alt="clear" style="width: 20px; height: 20px;">
+                            </button>
+                        </div>
+                        <div id="messagesBox" class="messages-box">
+                            <div class="empty-state">
+                                <div>Waiting for MQTT data...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div>
+                    <!-- MQTT Settings -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">MQTT Settings</div>
+                        </div>
+                        <div class="mqtt-form">
+                            <div class="form-group">
+                                <label class="label">Broker</label>
+                                <div class="sensor-value" id="mqttBroker">-</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Port</label>
+                                <div class="sensor-value" id="mqttPort">-</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Username</label>
+                                <div class="sensor-value" id="mqttUsername">-</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Client ID</label>
+                                <div class="sensor-value" id="mqttClientId">-</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Read Interval (s)</label>
+                                <div class="sensor-value" id="readInterval">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SSH Terminal -->
+                    <div class="panel" style="margin-top: 24px;">
+                        <div class="panel-header">
+                            <div class="panel-title">SSH Terminal</div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-icon" onclick="startSSH()" title="Start SSH" id="sshStartBtn">
+                                    <img src="/static/icons/start.png" alt="start" style="width: 20px; height: 20px;">
+                                </button>
+                                <button class="btn-icon" onclick="restartSSH()" title="Restart SSH">
+                                    <img src="/static/icons/restart.png" alt="Refresh" style="width: 20px; height: 20px;">
+                                </button>
+                            </div>
+                        </div>
+                        <div style="font-size: 11px; color: #9ca3af; margin-bottom: 8px;">
+                            Status: <span id="sshStatus" style="color: #ea7c69;">Not connected</span>
+                        </div>
+                        <div id="terminal" class="terminal-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/static/js/xterm.js"></script>
+    <script src="/static/js/xterm-addon-fit.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+// Global variables
+let socket = null;
+let term = null;
+let fitAddon = null;
+let currentConfig = null;
+let sshStarted = false;
+let authenticated = false;
 
-  <div>
-    <label>API Token:
-      <input id="token" type="password" placeholder="Bearer token" />
-    </label>
-    <button id="loadBtn">Load config</button>
-    <button id="saveBtn">Save config</button>
-  </div>
+// Wait for all libraries to load before initializing
+window.addEventListener('load', function() {
+    console.log('Page fully loaded, initializing...');
+    updateTime();
+    setInterval(updateTime, 1000);
+    initializeSocket();
+    initializeTerminal();
+});
 
-  <h3>Config (JSON)</h3>
-  <textarea id="configArea" rows="15"></textarea>
+// Socket.IO initialization
+function initializeSocket() {
+    socket = io();
+    
+    socket.on('connect', () => {
+        console.log('Connected to server');
+        updateSSHStatus('Not connected', 'error');
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        sshStarted = false;
+        updateSSHStatus('Disconnected', 'error');
+    });
+    
+    socket.on('mqtt_status', (data) => {
+        const statusEl = document.getElementById('mqttStatus');
+        if (data.status === 'connected') {
+            statusEl.textContent = `MQTT: Connected (${data.broker})`;
+            statusEl.classList.add('connected');
+        } else {
+            statusEl.textContent = 'MQTT: Disconnected';
+            statusEl.classList.remove('connected');
+        }
+    });
+    
+    socket.on('sensor_data', (data) => {
+        addMessage(data);
+    });
+    
+    socket.on('config_data', (config) => {
+        currentConfig = config;
+        renderConfig(config);
+    });
+    
+    // SSH events
+    socket.on('ssh_ready', () => {
+        sshStarted = true;
+        updateSSHStatus('Connected', 'success');
+        term.clear();
+        term.writeln('\x1b[32mSSH Terminal Ready\x1b[0m');
+        term.writeln('\x1b[90mConnected to ' + window.location.hostname + '\x1b[0m');
+        term.writeln('');
+    });
+    
+    socket.on('ssh_output', (data) => {
+        if (term) {
+            term.write(data.data);
+        }
+    });
+    
+    socket.on('ssh_error', (data) => {
+        if (term) {
+            term.writeln('\x1b[31m? Error: ' + data.error + '\x1b[0m');
+        }
+        updateSSHStatus('Error: ' + data.error, 'error');
+        sshStarted = false;
+    });
+    
+    socket.on('ssh_closed', () => {
+        sshStarted = false;
+        updateSSHStatus('Session closed', 'error');
+        if (term) {
+            term.writeln('\n\x1b[33m? SSH session closed\x1b[0m');
+        }
+    });
+}
 
-  <div id="status" style="margin-top:1rem;color:green"></div>
+// Terminal initialization
+function initializeTerminal() {
+    console.log('Initializing terminal...');
+    
+    // Check if libraries are loaded
+    if (typeof Terminal === 'undefined') {
+        console.error('xterm.js not loaded! Retrying...');
+        setTimeout(initializeTerminal, 200);
+        return;
+    }
+    
+    if (typeof FitAddon === 'undefined') {
+        console.error('FitAddon not loaded! Retrying...');
+        setTimeout(initializeTerminal, 200);
+        return;
+    }
+    
+    try {
+        term = new Terminal({
+            cursorBlink: true,
+            fontSize: 13,
+            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+            theme: {
+                background: '#0f1419',
+                foreground: '#e0e6ed',
+                cursor: '#ea7c69'
+            }
+        });
+        
+        // FitAddon ???c load t? file local
+        fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        
+        const termContainer = document.getElementById('terminal');
+        if (!termContainer) {
+            console.error('Terminal container #terminal not found!');
+            return;
+        }
+        
+        term.open(termContainer);
+        
+        // Fit terminal to container
+        setTimeout(() => {
+            fitAddon.fit();
+        }, 100);
+        
+        term.writeln('\x1b[36m  Brancher SSH Terminal\x1b[0m');
+        term.writeln('\x1b[90mClick "Start SSH" to connect...\x1b[0m');
+        
+        // Handle input
+        term.onData((data) => {
+            if (sshStarted && socket) {
+                socket.emit('ssh_input', { data: data });
+            }
+        });
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (fitAddon && term) {
+                fitAddon.fit();
+                if (sshStarted && socket) {
+                    socket.emit('ssh_resize', {
+                        rows: term.rows,
+                        cols: term.cols
+                    });
+                }
+            }
+        });
+        
+        console.log('? Terminal initialized successfully');
+    } catch (error) {
+        console.error('Error initializing terminal:', error);
+    }
+}
 
-<script src="/static/script.js"></script>
+// Update SSH status display
+function updateSSHStatus(message, type) {
+    const statusEl = document.getElementById('sshStatus');
+    if (statusEl) {
+        statusEl.textContent = message;
+        statusEl.style.color = type === 'success' ? '#4caf50' : '#ea7c69';
+    }
+}
+
+// Load config (called by script.js)
+window.onConfigLoaded = function(config) {
+    authenticated = true;
+    currentConfig = config;
+    renderConfig(config);
+    showStatus('Configuration loaded successfully', 'success');
+};
+
+// Render configuration
+function renderConfig(config) {
+    const sensors = config.sensors || [];
+    const container = document.getElementById('sensorsContainer');
+    const addBtnContainer = document.getElementById('addSensorContainer');
+    
+    if (sensors.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div>No sensors configured. Click "Add New Sensor" below.</div></div>';
+        document.getElementById('sensorCount').textContent = 'Sensors: 0';
+        addBtnContainer.style.display = 'block';
+        return;
+    }
+    
+    container.innerHTML = '';
+    addBtnContainer.style.display = 'block';
+    document.getElementById('sensorCount').textContent = `Sensors: ${sensors.length}`;
+    
+    sensors.forEach((sensor, index) => {
+        const sensorEl = createSensorElement(sensor, index);
+        container.appendChild(sensorEl);
+    });
+    
+    // Update MQTT settings display
+    document.getElementById('mqttBroker').textContent = config.mqtt_broker || '-';
+    document.getElementById('mqttPort').textContent = config.mqtt_port || '-';
+    document.getElementById('mqttUsername').textContent = config.mqtt_username || 'none';
+    document.getElementById('mqttClientId').textContent = config.mqtt_client_id || '-';
+    document.getElementById('readInterval').textContent = config.read_data_interval || '-';
+}
+
+// Create sensor element
+function createSensorElement(sensor, index) {
+    const sensorEl = document.createElement('div');
+    sensorEl.className = 'sensor-item';
+    sensorEl.id = `sensor-${index}`;
+    
+    const fields = [
+        { key: 'sensor_type', label: 'Sensor Type' },
+        { key: 'sensor_name', label: 'Sensor Name' },
+        { key: 'modbus_port', label: 'Port' },
+        { key: 'modbus_baudrate', label: 'Baudrate', type: 'number' },
+        { key: 'modbus_unit_id', label: 'Unit ID', type: 'number' },
+        { key: 'holding_register_address', label: 'Register Address', type: 'number' },
+        { key: 'holding_register_count', label: 'Register Count', type: 'number' },
+        { key: 'return_data_format', label: 'Data Format' },
+        { key: 'data_scale', label: 'Data Scale', type: 'number', step: '0.001' },
+        { key: 'offset', label: 'Offset', type: 'number' }
+    ];
+    
+    let fieldsHTML = '<div class="sensor-grid">';
+    fields.forEach(field => {
+        const value = sensor[field.key] || '';
+        fieldsHTML += `
+            <div class="form-group">
+                <label class="label">${field.label}</label>
+                <div class="sensor-value" data-field="${field.key}" data-value="${value}">${value || '-'}</div>
+            </div>
+        `;
+    });
+    
+    // MQTT Topic (full width)
+    fieldsHTML += `
+        <div class="form-group" style="grid-column: span 2;">
+            <label class="label">MQTT Topic</label>
+            <div class="sensor-value" data-field="mqtt_topic" data-value="${sensor.mqtt_topic || ''}">${sensor.mqtt_topic || '-'}</div>
+        </div>
+    `;
+    fieldsHTML += '</div>';
+    
+    sensorEl.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-weight: 600; color: #ea7c69;">Sensor ${sensor.id}: ${sensor.sensor_name || 'Unnamed'}</div>
+            <div style="font-size: 11px; color: #9ca3af;">${sensor.sensor_type || 'Unknown Type'}</div>
+        </div>
+        ${fieldsHTML}
+        <div class="sensor-actions">
+            <button class="btn-edit" onclick="editSensor(${index})"><img src="/static/icons/edit_1.png" alt="Edit"></button>
+            <button class="btn-delete" onclick="deleteSensor(${index})"><img src="/static/icons/delete_2.png" alt="Delete"></button>
+        </div>
+    `;
+    
+    return sensorEl;
+}
+
+// Edit sensor
+function editSensor(index) {
+    const sensorEl = document.getElementById(`sensor-${index}`);
+    if (!sensorEl) return;
+    
+    sensorEl.classList.add('edit-mode');
+    
+    const valueElements = sensorEl.querySelectorAll('.sensor-value');
+    valueElements.forEach(el => {
+        const field = el.dataset.field;
+        const value = el.dataset.value;
+        const type = getFieldType(field);
+        const step = field === 'data_scale' ? '0.001' : '1';
+        
+        const input = document.createElement('input');
+        input.className = 'sensor-value';
+        input.type = type;
+        input.value = value;
+        input.dataset.field = field;
+        if (type === 'number') input.step = step;
+        
+        el.replaceWith(input);
+    });
+    
+    const actionsDiv = sensorEl.querySelector('.sensor-actions');
+    actionsDiv.innerHTML = `
+        <button class="btn-save" onclick="saveSensor(${index})"><img src="/static/icons/save_2.png" alt="save"></button>
+        <button class="btn-cancel" onclick="cancelEdit(${index})"><img src="/static/icons/cancel.png" alt="cancel"></button>
+    `;
+}
+
+function getFieldType(field) {
+    const numberFields = ['modbus_baudrate', 'modbus_unit_id', 'holding_register_address', 'holding_register_count', 'data_scale', 'offset'];
+    return numberFields.includes(field) ? 'number' : 'text';
+}
+
+async function saveSensor(index) {
+    const sensorEl = document.getElementById(`sensor-${index}`);
+    if (!sensorEl) return;
+    
+    const inputs = sensorEl.querySelectorAll('input.sensor-value');
+    const updatedSensor = { id: currentConfig.sensors[index].id };
+    
+    inputs.forEach(input => {
+        const field = input.dataset.field;
+        let value = input.value;
+        
+        if (input.type === 'number') {
+            value = value ? (field === 'data_scale' ? parseFloat(value) : parseInt(value)) : 0;
+        }
+        
+        updatedSensor[field] = value;
+    });
+    
+    currentConfig.sensors[index] = updatedSensor;
+    
+    try {
+        const token = currentToken || document.getElementById('tokenInput').value.trim();
+        const response = await fetch('/config', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentConfig)
+        });
+        
+        if (response.ok) {
+            showStatus('Sensor updated successfully', 'success');
+            renderConfig(currentConfig);
+        } else {
+            showStatus('Failed to save sensor', 'error');
+        }
+    } catch (err) {
+        showStatus('Error: ' + err.message, 'error');
+    }
+}
+
+function cancelEdit(index) {
+    renderConfig(currentConfig);
+}
+
+async function deleteSensor(index) {
+    if (!confirm(`Are you sure you want to delete Sensor ${currentConfig.sensors[index].id}?`)) return;
+    
+    currentConfig.sensors.splice(index, 1);
+    currentConfig.sensors.forEach((sensor, i) => {
+        sensor.id = i + 1;
+    });
+    currentConfig.number_of_sensor = currentConfig.sensors.length;
+    
+    try {
+        const token = currentToken || document.getElementById('tokenInput').value.trim();
+        const response = await fetch('/config', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentConfig)
+        });
+        
+        if (response.ok) {
+            showStatus('Sensor deleted successfully', 'success');
+            renderConfig(currentConfig);
+        } else {
+            showStatus('Failed to delete sensor', 'error');
+        }
+    } catch (err) {
+        showStatus('Error: ' + err.message, 'error');
+    }
+}
+
+async function addNewSensor() {
+    if (!authenticated) {
+        showStatus('Please authenticate first', 'error');
+        return;
+    }
+    
+    const newId = currentConfig.sensors.length + 1;
+    const newSensor = {
+        id: newId,
+        sensor_type: 'NEW',
+        sensor_name: `NewSensor${newId}`,
+        modbus_port: '/dev/ttyUSB0',
+        modbus_baudrate: 9600,
+        modbus_unit_id: newId,
+        holding_register_address: 0,
+        holding_register_count: 2,
+        return_data_format: '3,-1',
+        data_scale: 0.001,
+        offset: 0,
+        mqtt_topic: `modbus/data/${newId}`
+    };
+    
+    currentConfig.sensors.push(newSensor);
+    currentConfig.number_of_sensor = currentConfig.sensors.length;
+    
+    try {
+        const token = currentToken || document.getElementById('tokenInput').value.trim();
+        const response = await fetch('/config', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentConfig)
+        });
+        
+        if (response.ok) {
+            showStatus('New sensor added successfully. Click Edit to configure.', 'success');
+            renderConfig(currentConfig);
+            
+            setTimeout(() => {
+                const newSensorEl = document.getElementById(`sensor-${newId - 1}`);
+                if (newSensorEl) {
+                    newSensorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    editSensor(newId - 1);
+                }
+            }, 300);
+        } else {
+            showStatus('Failed to add sensor', 'error');
+        }
+    } catch (err) {
+        showStatus('Error: ' + err.message, 'error');
+    }
+}
+
+function addMessage(data) {
+    const messagesBox = document.getElementById('messagesBox');
+    
+    const emptyState = messagesBox.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.remove();
+    }
+    
+    const messageEl = document.createElement('div');
+    messageEl.className = 'message-item';
+    
+    const payload = data.data;
+    const timestamp = new Date().toLocaleTimeString();
+    const sensorName = payload.sensor_name || 'Unknown';
+    const value = payload.value !== undefined ? payload.value : 'N/A';
+    const status = payload.status || 'Unknown';
+    
+    messageEl.innerHTML = `
+        <div class="message-time">${timestamp} ? Topic: ${data.topic}</div>
+        <div class="message-content">
+            <span class="message-sensor">${sensorName}</span>: ${value}
+            <span class="message-status ${status === 'Normal' ? 'status-normal' : 'status-error'}">${status}</span>
+        </div>
+    `;
+    
+    messagesBox.insertBefore(messageEl, messagesBox.firstChild);
+    
+    while (messagesBox.children.length > 50) {
+        messagesBox.removeChild(messagesBox.lastChild);
+    }
+}
+
+function startSSH() {
+    if (!term) {
+        showStatus('Terminal not initialized yet. Please wait...', 'error');
+        console.error('Terminal is null!');
+        return;
+    }
+    
+    if (sshStarted) {
+        showStatus('SSH session already started', 'error');
+        return;
+    }
+    
+    term.clear();
+    term.writeln('\x1b[33m? Starting SSH session...\x1b[0m');
+    updateSSHStatus('Connecting...', 'error');
+    socket.emit('start_ssh', {});
+}
+
+function restartSSH() {
+    if (!term) {
+        showStatus('Terminal not initialized yet. Please wait...', 'error');
+        return;
+    }
+    
+    if (sshStarted) {
+        socket.emit('close_ssh', {});
+        setTimeout(() => {
+            startSSH();
+        }, 500);
+    } else {
+        startSSH();
+    }
+}
+
+function saveConfig() {
+    if (!authenticated) {
+        showStatus('Please authenticate first', 'error');
+        return;
+    }
+    showStatus('Tip: Use Edit button on each sensor to modify configuration', 'success');
+}
+
+function clearMessages() {
+    const messagesBox = document.getElementById('messagesBox');
+    messagesBox.innerHTML = '<div class="empty-state"><div>Messages cleared. Waiting for new data...</div></div>';
+}
+
+function refreshData() {
+    if (!authenticated) {
+        showStatus('Please authenticate first', 'error');
+        return;
+    }
+    loadConfig();
+}
+
+function updateTime() {
+    const now = new Date();
+    const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+    const timeEl = document.getElementById('currentTime');
+    if (timeEl) {
+        timeEl.textContent = now.toLocaleDateString('en-US', options);
+    }
+}
+
+function showStatus(message, type) {
+    const statusEl = document.getElementById('statusMessage');
+    if (statusEl) {
+        statusEl.textContent = message;
+        statusEl.className = `status-message ${type}`;
+        statusEl.style.display = 'block';
+        
+        setTimeout(() => {
+            statusEl.style.display = 'none';
+        }, 4000);
+    }
+}
+</script>
 </body>
 </html>
